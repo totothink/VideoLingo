@@ -25,6 +25,10 @@ def text_processing_section():
             6. Merging subtitles into the video
         """, unsafe_allow_html=True)
 
+        if st.button("Transcribe", key="transcribe_button"):
+            transcribe()
+            st.rerun()
+
         if not os.path.exists("output/output_video_with_subs.mp4"):
             if st.button("Start Processing Subtitles", key="text_processing_button"):
                 process_text()
@@ -39,6 +43,12 @@ def text_processing_section():
                 cleanup()
                 st.rerun()
             return True
+        
+def transcribe():
+    with st.spinner("Transcribing..."):
+        step2_whisper.transcribe()
+    st.success("Transcription complete! 🎉")
+    st.balloons()
 
 def process_text():
     with st.spinner("Using Whisper for transcription..."):
