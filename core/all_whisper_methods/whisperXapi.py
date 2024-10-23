@@ -203,7 +203,8 @@ def save_results(df: pd.DataFrame):
         print(f"⚠️ Warning: Detected {len(long_words)} word(s) longer than 20 characters. These will be removed.")
         df = df[df['text'].str.len() <= 20]
     
-    df['text'] = df['text'].apply(lambda x: f'"{x}"')
+    # 由于经常会识别错误，需要人工修正，不用双引号方便修改
+    # df['text'] = df['text'].apply(lambda x: f'"{x}"') 
     df.to_excel(excel_path, index=False)
     print(f"📊 Excel file saved to {excel_path}")
 
