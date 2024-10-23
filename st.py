@@ -25,9 +25,22 @@ def text_processing_section():
             6. Merging subtitles into the video
         """, unsafe_allow_html=True)
 
-        if st.button("Transcribe", key="transcribe_button"):
-            transcribe()
-            st.rerun()
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("Transcribe", key="transcribe_button"):
+                transcribe()
+                st.rerun()
+
+        with col2:
+            if st.button("Reorganize document", key="reorganize_button"):
+                reorganize_document()
+                st.rerun()
+
+        with col3:
+            if st.button("Adjust Translation", key="adjust_translation_button"):
+                adjust_translation()
+                st.rerun()
 
         if not os.path.exists("output/output_video_with_subs.mp4"):
             if st.button("Start Processing Subtitles", key="text_processing_button"):
@@ -48,6 +61,20 @@ def transcribe():
     with st.spinner("Transcribing..."):
         step2_whisper.transcribe()
     st.success("Transcription complete! 🎉")
+    st.balloons()
+
+def reorganize_document():
+    with st.spinner("Reorganizing document..."):
+        step2_whisper.transcribe()
+        step3_1_spacy_split.split_by_spacy()
+        step3_2_splitbymeaning.split_sentences_by_meaning()
+    st.success("Reorganization complete! 🎉")
+    st.balloons()
+
+def adjust_translation():
+    with st.spinner("Adjusting translation..."):
+        step4_3_adjust_translate_by_duration.adjust_translate_by_duration()
+    st.success("Translation adjustment complete! 🎉")
     st.balloons()
 
 def process_text():
