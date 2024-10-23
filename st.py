@@ -73,6 +73,13 @@ def reorganize_document():
 
 def adjust_translation():
     with st.spinner("Adjusting translation..."):
+        step2_whisper.transcribe()
+        step3_1_spacy_split.split_by_spacy()
+        step3_2_splitbymeaning.split_sentences_by_meaning()
+        step4_1_summarize.get_summary()
+        if load_key("pause_before_translate"):
+            input("⚠️ PAUSE_BEFORE_TRANSLATE. Go to `output/log/terminology.json` to edit terminology. Then press ENTER to continue...")
+        step4_2_translate_all.translate_all()
         step4_3_adjust_translate_by_duration.adjust_translate_by_duration()
     st.success("Translation adjustment complete! 🎉")
     st.balloons()
