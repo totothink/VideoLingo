@@ -17,7 +17,7 @@ def estimate_duration(text):
     multiplier = 1
     # Define speech speed: characters/second or words/second, punctuation/second
     speed_zh_ja = 4 * multiplier  # Chinese and Japanese characters per second
-    speed_en_and_others = 3 * multiplier   # Words per second for English and other languages
+    speed_en_and_others = 2.5 * multiplier   # Words per second for English and other languages
     speed_punctuation = 4 * multiplier   # Punctuation marks per second
 
     # Count characters, words, and punctuation for each language

@@ -108,6 +108,10 @@ def parallel_split_sentences(sentences, max_length, max_workers, nlp, retry_atte
     return [sentence for sublist in new_sentences for sentence in sublist]
 
 def split_sentences_by_meaning():
+    if os.path.exists('output/log/sentence_splitbymeaning.txt'):
+        print("File 'sentence_splitbymeaning.txt' already exists. Skipping split_by_meaning.")
+        return
+
     """The main function to split sentences by meaning."""
     # read input sentences
     with open('output/log/sentence_splitbynlp.txt', 'r', encoding='utf-8') as f:
