@@ -1,10 +1,11 @@
 import sys, os
+import regex as re  # 使用支持 Unicode 的 regex 库
 import pandas as pd
 from typing import List, Tuple
 import concurrent.futures
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.step3_2_splitbymeaning import split_sentence
+from core.step3_2_splitbymeaning import split_sentence, remove_side_punctuation
 from core.ask_gpt import ask_gpt
 from core.prompts_storage import get_align_prompt
 from core.config_utils import load_key
@@ -46,7 +47,7 @@ def align_subs(src_sub: str, tr_sub: str, src_part: str) -> Tuple[List[str], Lis
     best = int(parsed['best'])
     align_data = parsed[f'align_{best}']
     
-    src_parts = src_part.split('\n')
+    src_parts = [item[f'src_part_{i+1}'].strip() for i, item in enumerate(align_data)]
     tr_parts = [item[f'target_part_{i+1}'].strip() for i, item in enumerate(align_data)]
     
     table = Table(title="🔗 Aligned parts")
@@ -90,6 +91,10 @@ def split_align_subs(src_lines: List[str], tr_lines: List[str], max_retry=5) -> 
         
         if all(len(src) <= MAX_SUB_LENGTH for src in src_lines) and all(calc_len(tr) * TARGET_SUB_MULTIPLIER <= MAX_SUB_LENGTH for tr in tr_lines):
             break
+
+    # Remove leading and trailing punctuation from all lines
+    src_lines = [remove_side_punctuation(line) for line in src_lines]
+    tr_lines = [remove_side_punctuation(line) for line in tr_lines]   
     
     return src_lines, tr_lines
 

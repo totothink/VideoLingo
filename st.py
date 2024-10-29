@@ -38,8 +38,8 @@ def text_processing_section():
                 st.rerun()
 
         with col3:
-            if st.button("Adjust Translation", key="adjust_translation_button"):
-                adjust_translation()
+            if st.button("生成字幕翻译", key="translation_button"):
+                translation()
                 st.rerun()
 
         if not os.path.exists("output/output_video_with_subs.mp4"):
@@ -82,6 +82,17 @@ def adjust_translation():
         step4_2_translate_all.translate_all()
         step4_3_adjust_translate_by_duration.adjust_translate_by_duration()
     st.success("Translation adjustment complete! 🎉")
+    st.balloons()
+
+def translation():
+    with st.spinner("Summarizing and translating..."):
+        step4_1_summarize.get_summary()
+        if load_key("pause_before_translate"):
+            input("⚠️ PAUSE_BEFORE_TRANSLATE. Go to `output/log/terminology.json` to edit terminology. Then press ENTER to continue...")
+        step4_2_translate_all.translate_all()
+    with st.spinner("Processing and aligning subtitles..."): 
+        step5_splitforsub.split_for_sub_main()
+    st.success("Subtitle processing complete! 🎉")
     st.balloons()
 
 def process_text():

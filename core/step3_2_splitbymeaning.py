@@ -1,4 +1,5 @@
 import sys,os,math
+import regex as re  # 使用支持 Unicode 的 regex 库
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import concurrent.futures
 from core.ask_gpt import ask_gpt
@@ -50,6 +51,13 @@ def find_split_positions(original, modified):
 
     return split_positions
 
+# 正则表达式匹配所有语言的标点符号
+PUNCTUATION_REGEX = r'^\p{P}+\p{S}*|\p{P}+\p{S}*$'
+
+def remove_side_punctuation(text: str) -> str:
+    """去除文本开头和结尾的所有语言标点符号及符号。"""
+    return re.sub(PUNCTUATION_REGEX, '', text)
+
 def split_sentence(sentence, num_parts, word_limit=18, index=-1, retry_attempt=0):
     """Split a long sentence using GPT and return the result as a string."""
     split_prompt = get_split_prompt(sentence, num_parts, word_limit)
@@ -63,11 +71,25 @@ def split_sentence(sentence, num_parts, word_limit=18, index=-1, retry_attempt=0
     # split the sentence based on the split points
     for i, split_point in enumerate(split_points):
         if i == 0:
-            best_split = sentence[:split_point] + '\n' + sentence[split_point:]
+            part1 = remove_side_punctuation(sentence[:split_point])  # 处理第一部分
+            part2 = remove_side_punctuation(sentence[split_point:])  # 处理第二部分
+            if part2 == '':
+                best_split = part1
+            else:
+                best_split = part1 + '\n' + part2
+            # best_split = sentence[:split_point] + '\n' + sentence[split_point:]
         else:
             parts = best_split.split('\n')
             last_part = parts[-1]
-            parts[-1] = last_part[:split_point - split_points[i-1]] + '\n' + last_part[split_point - split_points[i-1]:]
+            # 处理新拆分点的前后部分，确保去除多余标点符号
+            new_part1 = remove_side_punctuation(last_part[:split_point - split_points[i-1]])
+            new_part2 = remove_side_punctuation(last_part[split_point - split_points[i-1]:])
+            if new_part2 == '':
+                parts[-1] = new_part1
+            else:
+                parts[-1] = new_part1 + '\n' + new_part2
+
+            # parts[-1] = last_part[:split_point - split_points[i-1]] + '\n' + last_part[split_point - split_points[i-1]:]
             best_split = '\n'.join(parts)
     if index != -1:
         console.print(f'[green]✅ Sentence {index} has been successfully split[/green]')
